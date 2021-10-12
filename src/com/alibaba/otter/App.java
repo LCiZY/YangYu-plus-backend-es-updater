@@ -34,7 +34,7 @@ public class App {
             runningFlag = false;
             connector.disconnect();
             courseES.disconnect();
-            System.out.println("\nAll connections close successfully.");
+            System.out.println("\n[INFO] All connections closed successfully.");
 
         }));
 
@@ -80,7 +80,7 @@ public class App {
             }
 
             EventType eventType = rowChage.getEventType();
-            System.out.println(String.format("================&gt; binlog[%s:%s] , name[%s,%s] , eventType : %s",
+            System.out.println(String.format("[INFO] binlog[%s:%s] , name[%s,%s] , eventType : %s",
                     entry.getHeader().getLogfileName(), entry.getHeader().getLogfileOffset(),
                     entry.getHeader().getSchemaName(), entry.getHeader().getTableName(),
                     eventType));
@@ -100,6 +100,7 @@ public class App {
                     courseES.updateCourse(rowData.getAfterColumnsList());
                 }
             }
+            System.out.println("[INFO] Process done.");
         }
     }
 

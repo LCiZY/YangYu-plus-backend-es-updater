@@ -13,10 +13,7 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CourseES {
     private RestHighLevelClient restHighLevelClient;
@@ -32,12 +29,17 @@ public class CourseES {
         }
     }
 
-    private static final HashMap<String, Integer> Fields2Skip = new HashMap<String, Integer>() {{
-        put("courseCoverPicUrl", 1);
-        put("courseVideoUrl", 1);
-        put("courseMaxNum", 1);
-        put("version", 1);
-        put("courseSaleProperty", 1);
+    // 索引中不用记录的数据
+    private static final HashSet<String> Fields2Skip = new HashSet<String>() {{
+        add("courseWideType");
+        add("courseImageUrls");
+        add("courseCoverPicUrl");
+        add("courseVideoUrl");
+        add("courseMaxNum");
+        add("courseGroupOrderMaxNum");
+        add("courseGroupOrderHoldHours");
+        add("version");
+        add("courseSaleProperty");
     }};
 
     private static final String CoursePrimaryKeyField = "courseId";
@@ -46,7 +48,7 @@ public class CourseES {
         try {
             Map<String, Object> map = new HashMap<>();
             for (CanalEntry.Column  c : cols) {
-                if (Fields2Skip.get(c.getName()) == null)
+                if (!Fields2Skip.contains(c.getName()))
                     map.put(c.getName(), c.getValue());
             }
             IndexRequest request = new IndexRequest(ES.ESCourseIndexName);
@@ -92,7 +94,7 @@ public class CourseES {
                 if(CoursePrimaryKeyField.equals(c.getName()))
                     courseId = c.getValue();
                 else if (c.getUpdated()){ // 如果数据库更新了这个字段，那么索引也更新这个字段
-                    if (Fields2Skip.get(c.getName()) == null){
+                    if (!Fields2Skip.contains(c.getName()) ){
                         updatedField2Value.put(c.getName(), c.getValue());
                         updatedFields.add(c.getName());
                     }
